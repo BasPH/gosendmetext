@@ -22,15 +22,7 @@ var (
 func main() {
 	kingpin.Parse()
 
-	cfg := zap.NewProductionConfig()
-	if *debug {
-		cfg.Level.SetLevel(zap.DebugLevel)
-	}
-	cfg.Build()
-	zapLogger, _ := cfg.Build()
-	defer zapLogger.Sync()
-	logger = zapLogger.Sugar()
-
+	initLogging()
 	logger.Infof("Parsed CLI flags",
 		zap.Bool("debug", *debug),
 		zap.String("address", *address),
@@ -48,6 +40,17 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 	defer conn.Close()
+}
+
+func initLogging() {
+	cfg := zap.NewProductionConfig()
+	if *debug {
+		cfg.Level.SetLevel(zap.DebugLevel)
+	}
+	cfg.Build()
+	zapLogger, _ := cfg.Build()
+	defer zapLogger.Sync()
+	logger = zapLogger.Sugar()
 }
 
 func connect(protocol string, host string, port int) (net.Conn, error) {
