@@ -1,23 +1,24 @@
 package main
 
 import (
-	"fmt"
 	"go.uber.org/zap"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	verbose = kingpin.Flag("verbose", "Verbose mode").Short('v').Bool()
+	debug = kingpin.Flag("debug", "Debug logging").Short('d').Default("false").Bool()
 
-	logger *zap.Logger
+	logger *zap.SugaredLogger
 )
 
 func init() {
-	logger, _ = zap.NewProduction()
-	defer logger.Sync()
+	zapLogger, _ := zap.NewProduction()
+	defer zapLogger.Sync()
+	logger = zapLogger.Sugar()
 }
 
 func main() {
 	kingpin.Parse()
-	fmt.Printf("%v\n", *verbose)
+
+	logger.Infof("CLI flags:\ndebug: %s", *debug)
 }
