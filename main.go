@@ -3,6 +3,10 @@ package main
 import (
 	"go.uber.org/zap"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"net"
+	"fmt"
+	"io/ioutil"
+	"bytes"
 )
 
 var (
@@ -10,7 +14,8 @@ var (
 
 	address = kingpin.Flag("address", "Address (default 127.0.0.1)").Short('a').Default("127.0.0.1").String()
 	port = kingpin.Flag("port", "Port (default 9999)").Short('p').Default("9999").Int()
-	textfile = kingpin.Flag("textfile", "Textfile containing words (default /usr/share/dict/words)").Short('t').Default("/usr/share/dict/words").ExistingFile()
+	protocol = kingpin.Flag("protocol", "Protocol (default TCP)").Short('n').Default("tcp").Enum("tcp", "udp")
+	textfile = kingpin.Flag("textfile", "Textfile containing words, one per line (default /usr/share/dict/words)").Short('t').Default("/usr/share/dict/words").ExistingFile()
 	sleep = kingpin.Flag("sleep", "Sleep period (default 0.7s)").Short('s').Default("0.7s").Duration()
 
 	logger *zap.SugaredLogger
@@ -29,7 +34,24 @@ func main() {
 		zap.Bool("debug", *debug),
 		zap.String("address", *address),
 		zap.Int("port", *port),
+		zap.String("protocol", *protocol),
 		zap.String("textfile", *textfile),
 		zap.Duration("sleep", *sleep),
 	)
+
+	data, err := ioutil.ReadFile(*textfile)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	logger.Infof("Read data file with %v lines", len(bytes.Split(data, []byte{'\n'})))
+
+	conn, err := connect(*protocol, *address, *port)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	defer conn.Close()
+}
+
+func connect(protocol string, host string, port int) (net.Conn, error) {
+	return net.Dial(protocol, fmt.Sprintf("%s:%d", host, port))
 }
