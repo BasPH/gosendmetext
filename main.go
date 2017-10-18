@@ -5,8 +5,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net"
 	"fmt"
-	"io/ioutil"
-	"bytes"
 )
 
 var (
@@ -39,11 +37,8 @@ func main() {
 		zap.Duration("sleep", *sleep),
 	)
 
-	data, err := ioutil.ReadFile(*textfile)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
-	logger.Infof("Read data file with %v lines", len(bytes.Split(data, []byte{'\n'})))
+	w := Words{logger: logger}
+	w.LoadData(*textfile)
 
 	conn, err := connect(*protocol, *address, *port)
 	if err != nil {
