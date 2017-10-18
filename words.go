@@ -12,6 +12,8 @@ type Words struct {
 }
 
 func (w *Words) LoadData(textfile string) {
+	w.logger.Debugf("Reading file %s", textfile)
+
 	d, err := ioutil.ReadFile(textfile)
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -25,4 +27,6 @@ func (w *Words) LoadData(textfile string) {
 		}
 	}
 	w.data = result
+
+	w.logger.Debugf("Read file %s with %v lines", textfile, len(w.data))
 }

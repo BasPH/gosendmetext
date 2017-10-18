@@ -19,14 +19,17 @@ var (
 	logger *zap.SugaredLogger
 )
 
-func init() {
-	zapLogger, _ := zap.NewProduction()
-	defer zapLogger.Sync()
-	logger = zapLogger.Sugar()
-}
-
 func main() {
 	kingpin.Parse()
+
+	cfg := zap.NewProductionConfig()
+	if *debug {
+		cfg.Level.SetLevel(zap.DebugLevel)
+	}
+	cfg.Build()
+	zapLogger, _ := cfg.Build()
+	defer zapLogger.Sync()
+	logger = zapLogger.Sugar()
 
 	logger.Infof("Parsed CLI flags",
 		zap.Bool("debug", *debug),
