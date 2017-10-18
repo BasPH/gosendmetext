@@ -16,5 +16,13 @@ func (w *Words) LoadData(textfile string) {
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
-	w.data = bytes.Split(d, []byte{'\n'})
+	split := bytes.Split(d, []byte{'\n'})
+
+	var result [][]byte
+	for _, s := range split {
+		if len(s) > 0 {
+			result = append(result, s)
+		}
+	}
+	w.data = result
 }
