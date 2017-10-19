@@ -9,6 +9,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// RandomInts returns a slice of length in [nmin,nmax] of random integers between [0,maxval)
 func RandomInts(nmin int, nmax int, maxval int) []int {
 	nsize := 1
 	if nmax > 1 {

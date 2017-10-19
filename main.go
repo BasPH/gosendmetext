@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net"
-	"fmt"
-	"time"
 	"os"
+	"time"
 )
 
 var (

@@ -1,17 +1,19 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
-	"io/ioutil"
 	"bytes"
 	"fmt"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
 )
 
+// Words contains words to generate random sentences
 type Words struct {
 	data [][]byte
 	log  *logrus.Logger
 }
 
+// NewWords loads the data in Words
 func NewWords(log *logrus.Logger, textfile string) *Words {
 	w := &Words{
 		log: log,
@@ -20,6 +22,7 @@ func NewWords(log *logrus.Logger, textfile string) *Words {
 	return w
 }
 
+// LoadData reads a file containing words and sets the data field in a Words struct
 func (w *Words) LoadData(textfile string) {
 	w.log.Debugf("Reading file %s", textfile)
 
@@ -40,6 +43,7 @@ func (w *Words) LoadData(textfile string) {
 	w.log.Debugf("Read file %s with %v lines", textfile, len(w.data))
 }
 
+// RandomWords returns [nmin,nmax] random words from the data field
 func (w *Words) RandomWords(nmin int, nmax int) ([]byte, error) {
 	if nmin > len(w.data) {
 		return nil, fmt.Errorf("nmin (%d) must be smaller than data length (%d)", nmin, len(w.data))

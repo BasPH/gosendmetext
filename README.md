@@ -28,3 +28,4 @@ teretial wanworth bathos
 ```
 
 ## Building from source
+`make` to install in your `$GOPATH/bin` directory. Or, `make build` to build in the package source directory.
