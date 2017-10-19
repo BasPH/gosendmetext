@@ -1,47 +1,57 @@
 package main
 
 import (
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net"
 	"fmt"
 	"time"
+	"os"
 )
 
 var (
 	debug = kingpin.Flag("debug", "Debug logging").Short('d').Default("false").Bool()
 
-	address = kingpin.Flag("address", "Address (default 127.0.0.1)").Short('a').Default("127.0.0.1").String()
-	port = kingpin.Flag("port", "Port (default 9999)").Short('p').Default("9999").Int()
+	address  = kingpin.Flag("address", "Address (default 127.0.0.1)").Short('a').Default("127.0.0.1").String()
+	port     = kingpin.Flag("port", "Port (default 9999)").Short('p').Default("9999").Int()
 	protocol = kingpin.Flag("protocol", "Protocol (default TCP)").Short('n').Default("tcp").Enum("tcp", "udp")
 	textfile = kingpin.Flag("textfile", "Textfile containing words, one per line (default /usr/share/dict/words)").Short('t').Default("/usr/share/dict/words").ExistingFile()
 	minwords = kingpin.Flag("minwords", "Minimum number of words to send each time (default 1)").Default("1").Int()
 	maxwords = kingpin.Flag("maxwords", "Maximum number of words to send each time (default 50)").Default("50").Int()
-	sleep = kingpin.Flag("sleep", "Sleep period (default 0.7s)").Short('s').Default("0.7s").Duration()
+	sleep    = kingpin.Flag("sleep", "Sleep period (default 0.7s)").Short('s').Default("0.7s").Duration()
 
-	logger *zap.SugaredLogger
+	log *logrus.Logger
 )
+
+func init() {
+	log = logrus.New()
+	log.Formatter = logrus.Formatter(&logrus.JSONFormatter{})
+	log.Out = os.Stdout
+	log.Level = logrus.InfoLevel
+}
 
 func main() {
 	kingpin.Parse()
+	if *debug {
+		log.Level = logrus.DebugLevel
+	}
 
-	initLogging()
-	logger.Infof("Parsed CLI flags",
-		zap.Bool("debug", *debug),
-		zap.String("address", *address),
-		zap.Int("port", *port),
-		zap.String("protocol", *protocol),
-		zap.String("textfile", *textfile),
-		zap.Int("minwords", *minwords),
-		zap.Int("maxwords", *maxwords),
-		zap.Duration("sleep", *sleep),
-	)
+	log.WithFields(logrus.Fields{
+		"debug":    *debug,
+		"address":  *address,
+		"port":     *port,
+		"protocol": *protocol,
+		"textfile": *textfile,
+		"minwords": *minwords,
+		"maxwords": *maxwords,
+		"sleep":    *sleep,
+	}).Info("Parsed CLI flags")
 
-	w := NewWords(logger, *textfile)
+	w := NewWords(log, *textfile)
 
 	conn, err := connect(*protocol, *address, *port)
 	if err != nil {
-		logger.Fatal(err.Error())
+		log.Fatal(err.Error())
 	}
 	defer conn.Close()
 
@@ -50,17 +60,6 @@ func main() {
 		conn.Write(result)
 		time.Sleep(*sleep)
 	}
-}
-
-func initLogging() {
-	cfg := zap.NewProductionConfig()
-	if *debug {
-		cfg.Level.SetLevel(zap.DebugLevel)
-	}
-	cfg.Build()
-	zapLogger, _ := cfg.Build()
-	defer zapLogger.Sync()
-	logger = zapLogger.Sugar()
 }
 
 func connect(protocol string, host string, port int) (net.Conn, error) {

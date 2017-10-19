@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"bytes"
 	"fmt"
@@ -9,23 +9,23 @@ import (
 
 type Words struct {
 	data [][]byte
-	logger *zap.SugaredLogger
+	log  *logrus.Logger
 }
 
-func NewWords(logger *zap.SugaredLogger, textfile string) *Words {
+func NewWords(log *logrus.Logger, textfile string) *Words {
 	w := &Words{
-		logger: logger,
+		log: log,
 	}
 	w.LoadData(textfile)
 	return w
 }
 
 func (w *Words) LoadData(textfile string) {
-	w.logger.Debugf("Reading file %s", textfile)
+	w.log.Debugf("Reading file %s", textfile)
 
 	d, err := ioutil.ReadFile(textfile)
 	if err != nil {
-		logger.Fatal(err.Error())
+		log.Fatal(err.Error())
 	}
 	split := bytes.Split(d, []byte{'\n'})
 
@@ -37,7 +37,7 @@ func (w *Words) LoadData(textfile string) {
 	}
 	w.data = result
 
-	w.logger.Debugf("Read file %s with %v lines", textfile, len(w.data))
+	w.log.Debugf("Read file %s with %v lines", textfile, len(w.data))
 }
 
 func (w *Words) RandomWords(nmin int, nmax int) ([]byte, error) {
@@ -62,6 +62,6 @@ func (w *Words) RandomWords(nmin int, nmax int) ([]byte, error) {
 		}
 	}
 
-	w.logger.Debugf("Returning %d random words", len(idxs))
+	w.log.Debugf("Returning %d random words", len(idxs))
 	return result, nil
 }
