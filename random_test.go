@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRandomInts(t *testing.T) {
 	nmin, nmax, maxval := 1, 50, 300
@@ -16,3 +18,19 @@ func TestRandomInts(t *testing.T) {
 		}
 	}
 }
+
+func benchmarkRandomInts(nmax int, b *testing.B) {
+	nmin, maxval := 1, 300
+	for n := 0; n < b.N; n++ {
+		RandomInts(nmin, nmax, maxval)
+	}
+}
+
+func BenchmarkRandomInts1(b *testing.B)        { benchmarkRandomInts(1, b) }
+func BenchmarkRandomInts10(b *testing.B)       { benchmarkRandomInts(10, b) }
+func BenchmarkRandomInts100(b *testing.B)      { benchmarkRandomInts(100, b) }
+func BenchmarkRandomInts1000(b *testing.B)     { benchmarkRandomInts(1000, b) }
+func BenchmarkRandomInts10000(b *testing.B)    { benchmarkRandomInts(10000, b) }
+func BenchmarkRandomInts100000(b *testing.B)   { benchmarkRandomInts(100000, b) }
+func BenchmarkRandomInts1000000(b *testing.B)  { benchmarkRandomInts(1000000, b) }
+func BenchmarkRandomInts10000000(b *testing.B) { benchmarkRandomInts(10000000, b) }

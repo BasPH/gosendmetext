@@ -10,7 +10,10 @@ func init() {
 }
 
 func RandomInts(nmin int, nmax int, maxval int) []int {
-	nsize := rand.Intn(nmax-nmin) + nmin
+	nsize := 1
+	if nmax > 1 {
+		nsize = rand.Intn(nmax-nmin) + nmin
+	}
 	result := make([]int, nsize)
 	for i := 0; i <= nsize-1; i++ {
 		result[i] = rand.Intn(maxval)
