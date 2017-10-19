@@ -5,6 +5,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"net"
 	"fmt"
+	"time"
 )
 
 var (
@@ -44,8 +45,11 @@ func main() {
 	}
 	defer conn.Close()
 
-	result, _ := w.RandomWords(*minwords, *maxwords)
-	conn.Write(result)
+	for {
+		result, _ := w.RandomWords(*minwords, *maxwords)
+		conn.Write(result)
+		time.Sleep(*sleep)
+	}
 }
 
 func initLogging() {
