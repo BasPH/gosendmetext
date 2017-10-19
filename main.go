@@ -44,7 +44,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	result := w.RandomWords(*minwords, *maxwords)
+	result, _ := w.RandomWords(*minwords, *maxwords)
 	conn.Write(result)
 }
 

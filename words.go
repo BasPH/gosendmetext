@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	"io/ioutil"
 	"bytes"
+	"fmt"
 )
 
 type Words struct {
@@ -39,7 +40,16 @@ func (w *Words) LoadData(textfile string) {
 	w.logger.Debugf("Read file %s with %v lines", textfile, len(w.data))
 }
 
-func (w *Words) RandomWords(nmin int, nmax int) []byte {
+func (w *Words) RandomWords(nmin int, nmax int) ([]byte, error) {
+	if nmin > len(w.data) {
+		return nil, fmt.Errorf("nmin (%d) must be smaller than data length (%d)", nmin, len(w.data))
+	}
+	if nmax > len(w.data) {
+		return nil, fmt.Errorf("nmax (%d) must be smaller than data length (%d)", nmax, len(w.data))
+	}
+	if nmin > nmax {
+		return nil, fmt.Errorf("nmin must be <= nmax")
+	}
 
 	idxs := RandomInts(nmin, nmax, len(w.data))
 	var result []byte
@@ -53,5 +63,5 @@ func (w *Words) RandomWords(nmin int, nmax int) []byte {
 	}
 
 	w.logger.Debugf("Returning %d random words", len(idxs))
-	return result
+	return result, nil
 }
