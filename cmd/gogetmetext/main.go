@@ -62,7 +62,7 @@ func main() {
 			return
 		default:
 			message, _ := bufio.NewReader(conn).ReadString('\n')
-			log.Debugf("Message received: %s", message[:len(message)-1])
+			log.Infof("Message received: %s", message[:len(message)-1])
 		}
 	}
 }

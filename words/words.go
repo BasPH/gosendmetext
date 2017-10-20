@@ -77,6 +77,6 @@ func (w *Words) randomWords(nmin int, nmax int) ([]byte, error) {
 // SendRandomWords sends [nmin,nmax] random words to the given connection
 func (w *Words) SendRandomWords(c net.Conn, nmin int, nmax int) (n int, err error) {
 	rw, _ := w.randomWords(nmin, nmax)
-	w.log.Debugf("Writing random words: %v", string(rw[:]))
+	w.log.Infof("Writing random words: %v", string(rw[:]))
 	return c.Write(rw)
 }
