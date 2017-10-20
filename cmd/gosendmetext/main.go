@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"time"
+	"os/signal"
 )
 
 var (
@@ -56,8 +57,16 @@ func main() {
 	}
 	defer conn.Close()
 
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+
 	for {
-		w.SendRandomWords(conn, *minwords, *maxwords)
-		time.Sleep(*sleep)
+		select {
+		case <-signals:
+			return
+		default:
+			w.SendRandomWords(conn, *minwords, *maxwords)
+			time.Sleep(*sleep)
+		}
 	}
 }
