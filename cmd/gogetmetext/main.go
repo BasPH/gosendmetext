@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"bufio"
+	"os/signal"
 )
 
 var (
@@ -51,9 +52,17 @@ func main() {
 	}
 	defer conn.Close()
 
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+
 	log.Infof("Listening on %s %s:%d", *protocol, *address, *port)
 	for {
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-		log.Debugf("Message received: %s", message[:len(message)-1])
+		select {
+		case <-signals:
+			return
+		default:
+			message, _ := bufio.NewReader(conn).ReadString('\n')
+			log.Debugf("Message received: %s", message[:len(message)-1])
+		}
 	}
 }
