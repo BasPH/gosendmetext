@@ -43,20 +43,17 @@ func main() {
 
 	l, _ := net.Listen(*protocol, fmt.Sprintf("%s:%d", *address, *port))
 	defer l.Close()
-	log.Infof("Listening on %s %s:%d", *protocol, *address, *port)
 
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			log.Errorf("error accepting connection: %v", err.Error())
-			os.Exit(1)
-		}
-		go handleRequest(conn)
+	conn, err := l.Accept()
+	if err != nil {
+		log.Errorf("error accepting connection: %v", err.Error())
+		os.Exit(1)
 	}
-}
+	defer conn.Close()
 
-func handleRequest(conn net.Conn) {
-	message, _ := bufio.NewReader(conn).ReadString('\n')
-	log.Debugf("Message received: %s", message[:len(message)-1])
-	conn.Close()
+	log.Infof("Listening on %s %s:%d", *protocol, *address, *port)
+	for {
+		message, _ := bufio.NewReader(conn).ReadString('\n')
+		log.Debugf("Message received: %s", message[:len(message)-1])
+	}
 }
