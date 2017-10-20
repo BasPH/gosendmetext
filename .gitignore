@@ -1,2 +1,3 @@
 .idea/
-gosendmetext
+cmd/gosendmetext/gosendmetext
+cmd/gogetmetext/gogetmetext
